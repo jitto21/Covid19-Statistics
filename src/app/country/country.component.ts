@@ -34,10 +34,15 @@ export class CountryComponent implements OnInit, OnDestroy {
     scales: { xAxes: [{}], yAxes: [{ticks: {min:0, stepSize: 700, max: 14000}}] }
   };
 
+  // public confirmedArr: number[] = [];
+  // public deathArr: number[] = [];
+  // public recoveredArr: number[] = [];
+
+  todayConfirmedArr: any[] = []
+  todayDeathArr: any[] = [];
+  todayDischargedArr: any[] = [];
+
   public stateLabels: Label[] = [];
-  public confirmedArr: number[] = [];
-  public deathArr: number[] = [];
-  public recoveredArr: number[] = [];
   public barChartType: ChartType = 'bar';
   public barChartLegend = true;
   public barChartData: ChartDataSets[] = [
@@ -54,46 +59,40 @@ export class CountryComponent implements OnInit, OnDestroy {
     .subscribe((res: any)=> {
       res.statesArr.forEach((state: any)=> {
         this.stateLabels.push(state.loc);
-        // this.confirmedArr.push(state.totalConfirmed);
-        this.deathArr.push(state.deaths);
-        this.recoveredArr.push(state.discharged)
       });
     });
+
+    // this.covid.getStateCode()
+    // .subscribe(res=> {
+    //   console.log(res);
+    //   this.stateLabels = res.filter(data=>{
+    //     return (data !== 'date' && data !== 'status')
+    //   });
+    // });
 
     this.covid.getTodayCovid();
     this.todayDataArrSub = this.covid.getDataArrAsObs()
     .subscribe(res=> {
-      console.log(res);
+      // console.log(res);
       this.todayDataArr = res;
       console.log("Todays Data :: ", this.todayDataArr);
       this.barChartData.forEach((data, index)=>{ //pushing to bar chart data array
         data.data = this.todayDataArr[index];
       })
     })
-
-    // this.covid.getTodayCovid();
-
-    // this.covid.getYesterdayCovid();
-    // setTimeout(()=> {
-    //   console.log(" Timeout: Todays Confirmed :: ", this.todayDataArr);
-    //   this.barChartData.forEach((data, index)=>{ //pushing to bar chart data array
-    //     data.data = this.todayDataArr[index];
-    //   })
-    // },5000)
-      // console.log("Todays Death :: ",this.todayDeathArr);
-      // console.log("Todays Discharged :: ",this.todayDischargedArr);
-
-
   }
 
   chartClicked(event) {
-    let stateDataArr = this.covid.getStateToday(event.active[0]._index); //gets confirmed, discharged and death data for a particular state
-    console.log(stateDataArr);
+    let stateDataArrays = this.covid.getStateToday(event.active[0]._index); //gets confirmed, discharged and death data for a particular state
+    // console.log(stateDataArr);
     console.log(event);
     let stateObj = {
       stateName: event.active[0]._view.label,
+      stateTodayDataArr: stateDataArrays.today,
+      stateTotalDataArr:  stateDataArrays.total,
+      index: event.active[0]._index
     }
-    this.stateEvent.emit(event.active[0]._view.label);
+    this.stateEvent.emit(JSON.stringify(stateObj));
   }
 
   ngOnDestroy() {

@@ -6,11 +6,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  public state: string = '';
+  public stateObj: string = '';
   title = 'covid19';
 
   sateEventHandler(event) {
-    console.log(event);
-    this.state = event;
+    console.log(JSON.parse(event));
+    this.stateObj = event;
   }
 }

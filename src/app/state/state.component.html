@@ -1,24 +1,24 @@
-<h2>{{state}}</h2>
-<div class="chart-container">
-  <div class="row">
-    <div class="col-sm-5">
-      <canvas baseChart
-  [datasets]="barChartData"
-  [labels]="stateLabels"
-  [options]="barChartOptions"
-  [legend]="barChartLegend"
-  [chartType]="barChartType">
-</canvas>
+<div class="contain">
+  <h2>{{stateName}}</h2>
+  <div class="chart-container">
+    <div class="row">
+      <div class=" col-10 col-sm-5">
+        <canvas baseChart height="250px" [datasets]="barChartData" [labels]="stateLabels" [options]="barChartOptions"
+          [legend]="barChartLegend" [chartType]="barChartType">
+        </canvas>
+      </div>
+      <div class="col-10 col-sm-5">
+        <canvas baseChart height="250px" [datasets]="barChartDataTotal" [labels]="stateLabelsTotal"
+          [options]="barChartOptionsTotal" [legend]="barChartLegendTotal" [chartType]="barChartTypeTotal">
+        </canvas>
+      </div>
     </div>
-    <div class="col-sm-5">
-      <canvas baseChart
-  [datasets]="barChartDataTotal"
-  [labels]="stateLabelsTotal"
-  [options]="barChartOptionsTotal"
-  [legend]="barChartLegendTotal"
-  [chartType]="barChartTypeTotal">
-</canvas>
-    </div>
-  </div>
 
+  </div>
+  <button id="more-btn" (click)="onMoreDetails()" class="ml-5 btn btn-sm btn-outline-warning">
+    <span *ngIf="!viewDistrict">More Details</span>
+    <span *ngIf="viewDistrict">Hide Details</span>
+  </button>
 </div>
+<hr>
+<app-district [index]="index" *ngIf="viewDistrict"></app-district>

@@ -6,13 +6,15 @@ import { AppComponent } from './app.component';
 import { CountryComponent } from './country/country.component';
 import { StateComponent } from './state/state.component';
 import { HttpClientModule } from '@angular/common/http';
-import { ChartsModule } from 'ng2-charts'
+import { ChartsModule } from 'ng2-charts';
+import { DistrictComponent } from './state/district/district.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     CountryComponent,
-    StateComponent
+    StateComponent,
+    DistrictComponent
   ],
   imports: [
     BrowserModule,

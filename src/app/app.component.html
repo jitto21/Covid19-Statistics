@@ -1,7 +1,7 @@
 <div class="container">
   <app-country (stateEvent)="sateEventHandler($event)"></app-country>
   <hr>
-  <app-state [state]="state" *ngIf="state!=''"></app-state>
+  <app-state [state]="stateObj" *ngIf="stateObj!=''"></app-state>
 </div>
 
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map } from 'rxjs/operators'
+import { map, take } from 'rxjs/operators'
 import { HttpClient } from '@angular/common/http'
 import { combineLatest, BehaviorSubject, Subject } from 'rxjs';
 
@@ -7,17 +7,29 @@ import { combineLatest, BehaviorSubject, Subject } from 'rxjs';
 export class CovidService {
 
   yesterdayStateDetails: any[] = [];
-  todayStateDetails: any[] = [];
+  totalStateDetails: any[] = [];
+  //today
   todayConfirmedArr: number[] = []
   todayDeathArr: number[] = [];
   todayDischargedArr: number[] = [];
+  // total
+  totalConfirmedArr: number[] = []
+  totalDeathArr: number[] = [];
+  totalDischargedArr: number[] = [];
   todayDataArr;
 
   private dataArrSub = new Subject<any[]>();
+  index: number;
+  lastRefreshedDate: any;
 
-  // todayStateDetails: any;
-  // yesterdayStateDetails: any;
   constructor(private http: HttpClient) {}
+
+  getStateCode() {
+    return this.http.get('https://api.covid19india.org/states_daily.json')
+    .pipe(map((res: any)=> {
+      return Object.keys(res.states_daily[0]);
+    }));
+  }
 
   getCovidDetails() {
     return this.http.get('https://api.rootnet.in/covid19-in/stats/latest').pipe(map((res: any)=> {
@@ -29,40 +41,37 @@ export class CovidService {
     }))
   }
 
-  // getTodayCovid() { //getLatest
-
-  // }
-
-  // getYesterdayCovid() {
-
-  // }
-
   getTodayCovid() {
 
     let date = new Date(new Date().getTime() - (new Date().getTimezoneOffset() * 60000 ));
-    let today = date.toISOString().split("T")[0];; //todays date
+    let today = date.toISOString().split("T")[0]; //todays date
+    console.log(today);
 
-    let todayCovidObs = this.http.get('https://api.rootnet.in/covid19-in/stats/history').pipe(map((res: any)=> {
+    let totalCovidObs = this.http.get('https://api.rootnet.in/covid19-in/stats/history').pipe(map((res: any)=> {
+      console.log(res);
       if(res.success == true) {
-        let todayDetails = res.data.find(oneDay=> {
-          return oneDay.day == today
+        let lastRefreshedDate = res.lastRefreshed.split('T')[0];
+        let totalDetails = res.data.find(oneDay=> {
+          return oneDay.day == lastRefreshedDate;
         })
-        return todayDetails;
+        console.log(totalDetails);
+        return totalDetails;
       }
     }))
 
-    todayCovidObs.subscribe(res=> {
+    totalCovidObs.subscribe(res=> {
       console.log(res);
-      this.todayStateDetails = res.regional;
-      console.log(this.todayStateDetails);
+      this.totalStateDetails = res.regional;
+      console.log(this.totalStateDetails);
     })
-
-    let yesterday = new Date(date.setDate(date.getDate()- 1)).toISOString().split("T")[0];; //yesterday date
 
     let yesterdayCovidObs = this.http.get('https://api.rootnet.in/covid19-in/stats/history').pipe(map((res: any)=> {
       if(res.success == true) {
+        let lastRefreshedDate = res.lastRefreshed.split('T')[0];
+        console.log(lastRefreshedDate);
+        // let yesterday = new Date(this.lastRefreshedDate.setDate(this.lastRefreshedDate.getDate()- 1)).toISOString().split("T")[0]; //previous date from lastRefreshed Date
         let yesterdayDetails = res.data.find(oneDay=> {
-          return oneDay.day == yesterday
+          return oneDay.day == '2020-08-04'  //dynaically get yestreday's date
         })
         return yesterdayDetails;
       }
@@ -73,13 +82,18 @@ export class CovidService {
       this.yesterdayStateDetails = res.regional;
       console.log(this.yesterdayStateDetails)
     })
-    return combineLatest(todayCovidObs, yesterdayCovidObs ,()=>({}) )
+    return combineLatest(totalCovidObs, yesterdayCovidObs ,()=>({}) )
     .subscribe(res=> {
       console.log("two obs have completed");
-      this.todayStateDetails.forEach((todayState, index)=> {
+      this.totalStateDetails.forEach((todayState, index)=> {
+        //today's
         this.todayConfirmedArr.push(todayState.totalConfirmed - this.yesterdayStateDetails[index].totalConfirmed);
-        this.todayDischargedArr.push(todayState.discharged - this.yesterdayStateDetails[index].discharged)
-        this.todayDeathArr.push(todayState.deaths - this.yesterdayStateDetails[index].deaths)
+        this.todayDischargedArr.push(todayState.discharged - this.yesterdayStateDetails[index].discharged);
+        this.todayDeathArr.push(todayState.deaths - this.yesterdayStateDetails[index].deaths);
+        //total
+        this.totalConfirmedArr.push(todayState.totalConfirmed);
+        this.totalDischargedArr.push(todayState.discharged);
+        this.totalDeathArr.push(todayState.deaths);
       });
       this.todayDataArr = new Array(this.todayConfirmedArr, this.todayDischargedArr, this.todayDeathArr); //array of confirmed, discharged and deaths of today
       console.log(" Service: Todays Confirmed :: ", this.todayDataArr);
@@ -93,11 +107,31 @@ export class CovidService {
 
   getStateToday(index: number) { //returns confirmed, discharged and death data for a particular state
     console.log(index);
-    return [
-      this.todayConfirmedArr[index],
-      this.todayDischargedArr[index],
-      this.todayDeathArr[index]
-    ]
+    this.index = index;
+    return {
+      today:[
+        this.todayConfirmedArr[index],
+        this.todayDischargedArr[index],
+        this.todayDeathArr[index]
+      ],
+      total: [
+        this.totalConfirmedArr[index],
+        this.totalDischargedArr[index],
+        this.totalDeathArr[index]
+      ]
+    }
+  }
+
+  getTotalStateCovid() {
+    return this.totalStateDetails;
+  }
+
+  getDistrictCovid() {
+    return this.http.get('https://api.covid19india.org/state_district_wise.json')
+    .pipe(map(res=> {
+       return Object.values(res).slice(1);
+    }))
+
   }
 
 }
