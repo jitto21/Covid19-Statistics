@@ -1,0 +1,10 @@
+<div class="chart-container">
+  <canvas baseChart height="300px"
+  [datasets]="barChartData"
+  [labels]="stateLabels"
+  [options]="barChartOptions"
+  [legend]="barChartLegend"
+  [chartType]="barChartType"
+  (chartClick)="chartClicked($event)">
+</canvas>
+</div>
