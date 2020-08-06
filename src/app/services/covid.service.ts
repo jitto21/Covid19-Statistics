@@ -20,9 +20,13 @@ export class CovidService {
 
   private dataArrSub = new Subject<any[]>();
   index: number;
-  lastRefreshedDate: any;
+  private lastRefreshedDate: any;
 
   constructor(private http: HttpClient) {}
+
+  getLastRefreshed() {
+    return this.lastRefreshedDate;
+  }
 
   getStateCode() {
     return this.http.get('https://api.covid19india.org/states_daily.json')
@@ -50,9 +54,9 @@ export class CovidService {
     let totalCovidObs = this.http.get('https://api.rootnet.in/covid19-in/stats/history').pipe(map((res: any)=> {
       console.log(res);
       if(res.success == true) {
-        let lastRefreshedDate = res.lastRefreshed.split('T')[0];
+        this.lastRefreshedDate = res.lastRefreshed.split('T')[0];
         let totalDetails = res.data.find(oneDay=> {
-          return oneDay.day == lastRefreshedDate;
+          return oneDay.day == this.lastRefreshedDate;
         })
         console.log(totalDetails);
         return totalDetails;
@@ -67,11 +71,11 @@ export class CovidService {
 
     let yesterdayCovidObs = this.http.get('https://api.rootnet.in/covid19-in/stats/history').pipe(map((res: any)=> {
       if(res.success == true) {
-        let lastRefreshedDate = res.lastRefreshed.split('T')[0];
-        console.log(lastRefreshedDate);
-        // let yesterday = new Date(this.lastRefreshedDate.setDate(this.lastRefreshedDate.getDate()- 1)).toISOString().split("T")[0]; //previous date from lastRefreshed Date
+        let date = new Date(res.lastRefreshed);
+        let yesterday = new Date(date.setDate(date.getDate()- 1)).toISOString().split("T")[0]; //previous date from lastRefreshed Date
+        console.log(yesterday);
         let yesterdayDetails = res.data.find(oneDay=> {
-          return oneDay.day == '2020-08-04'  //dynaically get yestreday's date
+          return oneDay.day == yesterday  //dynaically get yestreday's date
         })
         return yesterdayDetails;
       }

@@ -1,28 +1,32 @@
 <div class="contain">
   <div class="row">
     <div class="col-10">
-      <h4>Districts</h4>
       <!-- <canvas baseChart [datasets]="barChartData" [labels]="districtLabels" [options]="barChartOptions"
         [legend]="barChartLegend" [chartType]="barChartType">
       </canvas> -->
       <div class="district-table">
-        <table class="table table-responsive">
+        <table id="district-table" class="table table-responsive">
           <thead class="">
             <tr>
-              <th scope="col">District</th>
-              <th scope="col"><span class="text-warning">Active</span></th>
-              <th scope="col"><span class="text-info">Confirmed</span></th>
+              <th scope="col">Name</th>
+              <th scope="col"><span class="text-info">Active</span></th>
+              <th scope="col"><span class="text-warning">Confirmed</span></th>
               <th scope="col"><span class="text-success">Recovered</span></th>
               <th scope="col"><span class="text-danger">Deaths</span></th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let disName of districtNameArr;let i=index">
-              <th scope="row">{{disName}}</th>                      <!--district-->
-              <td>{{eachDistrictData[i].active}}</td>               <!--active-->
-              <td>{{eachDistrictData[i].confirmed}}</td>            <!--confirmed-->
-              <td>{{eachDistrictData[i].recovered}}</td>           <!--discharged-->
-              <td>{{eachDistrictData[i].deceased}}</td>                <!--death-->
+              <th scope="row">{{disName}}</th>
+              <!--district-->
+              <td>{{eachDistrictData[i].active}}</td>
+              <!--active-->
+              <td>{{eachDistrictData[i].confirmed}}</td>
+              <!--confirmed-->
+              <td>{{eachDistrictData[i].recovered}}</td>
+              <!--discharged-->
+              <td>{{eachDistrictData[i].deceased}}</td>
+              <!--death-->
             </tr>
           </tbody>
         </table>

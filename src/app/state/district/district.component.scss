@@ -3,6 +3,7 @@
     margin: 0px auto;
     div {
       margin: 0px auto;
+      padding: 0;
     }
   }
 }
@@ -10,5 +11,19 @@
 .district-table {
   .table {
     color: #ffffff;
+    margin: 0px auto;
+    font-size: 2vh;
   }
 }
+
+// .grid-container {
+//   display: grid;
+//   grid-template-columns: repeat(5, 1fr);
+//   column-gap: 10px;
+//   row-gap: 15px;
+//   background-color: orange;
+//   // justify-items: center;
+//   // align-items: center;
+//   place-items: center center;
+//   place-content: start space-evenly;
+// }

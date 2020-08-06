@@ -2,6 +2,7 @@ import { Component, OnInit, Input, OnChanges } from '@angular/core';
 import { ChartOptions, ChartType, ChartDataSets } from 'chart.js';
 import { Label } from 'ng2-charts';
 import { CovidService } from 'src/app/services/covid.service';
+import { NgAnimateScrollService } from 'ng-animate-scroll';
 
 @Component({
   selector: 'app-district',
@@ -44,7 +45,7 @@ export class DistrictComponent implements OnInit, OnChanges {
   //   { data: [1], label: 'Deaths', backgroundColor: '#F1948A', hoverBackgroundColor: '#C0392B' }
   // ];
 
-  constructor(private covid: CovidService) { }
+  constructor(private covid: CovidService, private animateScrollService: NgAnimateScrollService) { }
 
   ngOnInit(): void {
     this.storeData();
@@ -55,13 +56,14 @@ export class DistrictComponent implements OnInit, OnChanges {
   }
 
   storeData() {
+    // this.animateScrollService.scrollToElement('district-table', 800);
     this.covid.getDistrictCovid()
     .subscribe(res=> {
       console.log(res);
       this.districtNameArr = Object.keys(res[this.index].districtData); //creates the name array of districts
       this.eachDistrictData = Object.values(res[this.index].districtData); //creates array of {active: number, confirmed: number, recovered: number, death: number} of districts
       console.log(this.eachDistrictData);
-      console.log("Districts :: " ,this.districtNameArr)
+      console.log("Districts :: " ,this.districtNameArr);
     });
   }
 

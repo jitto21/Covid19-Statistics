@@ -2,7 +2,8 @@ import { Component, OnInit, Input, EventEmitter, Output, OnDestroy } from '@angu
 import { CovidService } from '../services/covid.service';
 import { ChartOptions, ChartType, ChartDataSets } from 'chart.js';
 import { Label } from 'ng2-charts';
-import { combineAll } from 'rxjs/operators';
+import { getStateList } from '../services/getStateList';
+import { getStatefromCode } from '../services/getState';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -31,7 +32,15 @@ export class CountryComponent implements OnInit, OnDestroy {
         fontSize: 13
       }
     },
-    scales: { xAxes: [{}], yAxes: [{ticks: {min:0, stepSize: 700, max: 14000}}] }
+    scales: { xAxes: [{}], yAxes: [{}] },
+    tooltips: {
+      callbacks : { //getting full state name from state code
+        title: function(tooltipItem, data) {
+          let stateName = getStatefromCode(data['labels'][tooltipItem[0]['index']].toString());
+          return stateName;
+        }
+      }
+    }
   };
 
   // public confirmedArr: number[] = [];
@@ -51,24 +60,27 @@ export class CountryComponent implements OnInit, OnDestroy {
         { data: [], label: 'Deaths', backgroundColor: '#F1948A', hoverBackgroundColor: '#C0392B' }
   ];
   todayDataArrSub: Subscription;
+  lastRefreshed: any;
 
   constructor(private covid: CovidService) { }
 
   ngOnInit(): void {
-    this.covid.getCovidDetails()
-    .subscribe((res: any)=> {
-      res.statesArr.forEach((state: any)=> {
-        this.stateLabels.push(state.loc);
-      });
-    });
+    this.stateLabels = Object.keys(getStateList());
+    // this.covid.getCovidDetails()
+    // .subscribe((res: any)=> {
 
-    // this.covid.getStateCode()
-    // .subscribe(res=> {
-    //   console.log(res);
-    //   this.stateLabels = res.filter(data=>{
-    //     return (data !== 'date' && data !== 'status')
+    //   res.statesArr.forEach((state: any)=> {
+    //     console.log(state.loc);
+    //     this.stateLabels.push(state.loc);
     //   });
     // });
+
+    this.lastRefreshed = this.covid.getLastRefreshed();
+
+    this.covid.getStateCode()
+    .subscribe(res=> {
+      console.log(res);
+    });
 
     this.covid.getTodayCovid();
     this.todayDataArrSub = this.covid.getDataArrAsObs()
@@ -84,15 +96,17 @@ export class CountryComponent implements OnInit, OnDestroy {
 
   chartClicked(event) {
     let stateDataArrays = this.covid.getStateToday(event.active[0]._index); //gets confirmed, discharged and death data for a particular state
+    let stateName = getStatefromCode(event.active[0]._view.label) //gets full State Name form state code
     // console.log(stateDataArr);
     console.log(event);
     let stateObj = {
-      stateName: event.active[0]._view.label,
+      stateName: stateName,
       stateTodayDataArr: stateDataArrays.today,
       stateTotalDataArr:  stateDataArrays.total,
       index: event.active[0]._index
     }
     this.stateEvent.emit(JSON.stringify(stateObj));
+    // document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
   }
 
   ngOnDestroy() {
