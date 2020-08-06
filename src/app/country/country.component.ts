@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { CovidService } from '../services/covid.service';
 import { ChartOptions, ChartType, ChartDataSets } from 'chart.js';
 import { Label } from 'ng2-charts';
@@ -22,20 +22,25 @@ export class CountryComponent implements OnInit, OnDestroy {
     maintainAspectRatio: true,
     title: {
       display: true,
-      text: "Today's Covid19 Statistics",
-      fontSize: 18
+      fontSize: 22,
+      text: ["Today's Covid19 Statistics: India"],
+      fontColor: 'white'
     },
     legend: {
       labels: {
-        fontColor: '#fffff',
+        fontColor: 'white',
         fontFamily: 'b612',
         fontSize: 13
-      }
+      },
+      onHover: ((event, legendItem) => {
+        console.log(event);
+        console.log(legendItem);
+      })
     },
-    scales: { xAxes: [{}], yAxes: [{}] },
+    scales: { xAxes: [{ display: true, gridLines: { display: false } }], yAxes: [{ display: true, gridLines: { color: 'rgba(132, 132, 132, 0.23)' } }] },
     tooltips: {
-      callbacks : { //getting full state name from state code
-        title: function(tooltipItem, data) {
+      callbacks: { //getting full state name from state code
+        title: function (tooltipItem, data) {
           let stateName = getStatefromCode(data['labels'][tooltipItem[0]['index']].toString());
           return stateName;
         }
@@ -55,9 +60,9 @@ export class CountryComponent implements OnInit, OnDestroy {
   public barChartType: ChartType = 'bar';
   public barChartLegend = true;
   public barChartData: ChartDataSets[] = [
-    { data: [], label: 'Confirmed Cases', backgroundColor: '#F9E79F', hoverBackgroundColor: '#F7DC6F'  },
-        { data: [], label: 'Discharged', backgroundColor: ' #82E0AA', hoverBackgroundColor: '#58D68D' },
-        { data: [], label: 'Deaths', backgroundColor: '#F1948A', hoverBackgroundColor: '#C0392B' }
+    { data: [], label: 'Confirmed Cases', backgroundColor: '#F9E79F', hoverBackgroundColor: '#F7DC6F' },
+    { data: [], label: 'Discharged', backgroundColor: ' #82E0AA', hoverBackgroundColor: '#58D68D' },
+    { data: [], label: 'Deaths', backgroundColor: '#F1948A', hoverBackgroundColor: '#C0392B' }
   ];
   todayDataArrSub: Subscription;
   lastRefreshed: any;
@@ -65,7 +70,7 @@ export class CountryComponent implements OnInit, OnDestroy {
   constructor(private covid: CovidService) { }
 
   ngOnInit(): void {
-    this.stateLabels = Object.keys(getStateList());
+    this.stateLabels = Object.keys(getStateList()); //get state codes to Chart Labels
     // this.covid.getCovidDetails()
     // .subscribe((res: any)=> {
 
@@ -74,24 +79,25 @@ export class CountryComponent implements OnInit, OnDestroy {
     //     this.stateLabels.push(state.loc);
     //   });
     // });
-
-    this.lastRefreshed = this.covid.getLastRefreshed();
-
     this.covid.getStateCode()
-    .subscribe(res=> {
-      console.log(res);
-    });
+      .subscribe(res => {
+        console.log(res);
+      });
 
     this.covid.getTodayCovid();
     this.todayDataArrSub = this.covid.getDataArrAsObs()
-    .subscribe(res=> {
-      // console.log(res);
-      this.todayDataArr = res;
-      console.log("Todays Data :: ", this.todayDataArr);
-      this.barChartData.forEach((data, index)=>{ //pushing to bar chart data array
-        data.data = this.todayDataArr[index];
+      .subscribe(res => {
+        // console.log(res);
+        this.todayDataArr = res;
+        console.log("Todays Data :: ", this.todayDataArr);
+        this.barChartData.forEach((data, index) => { //pushing to bar chart data array
+          data.data = this.todayDataArr[index];
+        })
+        this.lastRefreshed = this.covid.getLastRefreshed(); //get Last refreshed
+        // Array(this.barChartOptions.title.text).push(this.lastRefreshed.toString());
+        console.log("Last Refreshed ", this.lastRefreshed.toString());
+
       })
-    })
   }
 
   chartClicked(event) {
@@ -102,7 +108,7 @@ export class CountryComponent implements OnInit, OnDestroy {
     let stateObj = {
       stateName: stateName,
       stateTodayDataArr: stateDataArrays.today,
-      stateTotalDataArr:  stateDataArrays.total,
+      stateTotalDataArr: stateDataArrays.total,
       index: event.active[0]._index
     }
     this.stateEvent.emit(JSON.stringify(stateObj));

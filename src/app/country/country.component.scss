@@ -2,3 +2,22 @@
   margin: 0;
   padding-bottom: 1vh;
 }
+
+p{
+  padding: 0;
+  margin: 0 1vw;
+  font-size: 1vw;
+}
+p#last-refreshed {
+
+  float: left;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+p#message {
+  color: orange;
+  float: right;
+  font-style: italic;
+  font-weight: lighter;
+}

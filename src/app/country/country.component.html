@@ -1,10 +1,9 @@
 <div class="chart-container">
-  <canvas baseChart height="180px"
-  [datasets]="barChartData"
-  [labels]="stateLabels"
-  [options]="barChartOptions"
-  [legend]="barChartLegend"
-  [chartType]="barChartType"
-  (chartClick)="chartClicked($event)">
-</canvas>
+  <canvas baseChart height="170px" [datasets]="barChartData" [labels]="stateLabels" [options]="barChartOptions"
+    [legend]="barChartLegend" [chartType]="barChartType" (chartClick)="chartClicked($event)">
+  </canvas>
+</div>
+<div class="info">
+  <p id="last-refreshed">Last Refreshed: {{ lastRefreshed }}</p>
+  <p id="message">*Click on each bar to get more info*</p>
 </div>

@@ -17,7 +17,7 @@ export function getStatefromCode(stateName: string) {
     case 'JH': return 'Jharkhand'
     case 'KA': return 'Karnataka'
     case 'KL': return 'Kerala'
-    case 'LK': return 'Ladakh'
+    case 'LA': return 'Ladakh'
     case 'LD': return 'Lakshadweep'
     case 'MP': return 'Madhya Pradesh'
     case 'MH': return 'Maharashtra'

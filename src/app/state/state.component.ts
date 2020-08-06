@@ -39,7 +39,7 @@ export class StateComponent implements OnInit, OnChanges {
   };
   public pieChartLabels: Label[] = ['Confirmed', 'Recovered', 'Deaths'];
   public pieChartData: number[] = [];
-  public pieChartType: ChartType = 'pie';
+  public pieChartType: ChartType = 'doughnut';
   public pieChartLegend = true;
   public pieChartColors = [
     {
@@ -95,7 +95,7 @@ export class StateComponent implements OnInit, OnChanges {
   };
   public pieChartLabelsTotal: Label[] = ['Confirmed', 'Recovered', 'Deaths'];
   public pieChartDataTotal: number[] = [];
-  public pieChartTypeTotal: ChartType = 'pie';
+  public pieChartTypeTotal: ChartType = 'doughnut';
   public pieChartLegendTotal = true;
   public pieChartColorsTotal = [
     {
@@ -124,7 +124,7 @@ export class StateComponent implements OnInit, OnChanges {
   }
 
   private storeStateData() {
-    this.animateScrollService.scrollToElement('more-btn', 1000);
+    this.animateScrollService.scrollToElement('row-scroll-to', 1000);
     this.realStateObj = JSON.parse(this.stateObj);
     this.index = this.realStateObj.index;
     this.stateName = this.realStateObj.stateName;
